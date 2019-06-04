@@ -19,12 +19,12 @@
         "PortalEmail": {
             "Type": "String",
             "Description": "Address from which emails will be sent from to approvers.",
-            "Default": "approval@roundtower.io"
+            "Default": "rajesh.ramaswamy@netenrich.com"
         },
         "ApproverEmail": {
             "Type": "String",
             "Description": "Email address that will receive WorkSpace Creation approval requests.",
-            "Default": "earl@eeg3.net"
+            "Default": "rajesh.ramaswamy@netenrich.com"
         },
         "DirectoryServicesId": {
             "Type": "String",
@@ -34,7 +34,7 @@
         "ApprovedDomain": {
             "Type": "String",
             "Description": "Approved email domain that can sign up for Portal access.",
-            "Default": "eeg3.net"
+            "Default": "owa.netenrrich.com"
         }
     },
     "Resources": {
@@ -42,7 +42,7 @@
             "Type": "AWS::Serverless::Function",
             "Properties": {
                 "Handler": "cogDomainVerify.handler",
-                "Runtime": "nodejs6.10",
+                "Runtime": "nodejs8.10",
                 "CodeUri": "./lambda/cognito-domainVerify/",
                 "Environment": {
                     "Variables": {
@@ -57,7 +57,7 @@
             "Type": "AWS::Serverless::Function",
             "Properties": {
                 "Handler": "workspaces-control.handler",
-                "Runtime": "nodejs6.10",
+                "Runtime": "nodejs8.10",
                 "CodeUri": "./lambda/workspaces-control/",
                 "Timeout": 5,
                 "Policies": ["AmazonWorkSpacesAdmin", "AWSStepFunctionsFullAccess", "AWSLambdaRole"],
@@ -80,7 +80,7 @@
             "Type": "AWS::Serverless::Function",
             "Properties": {
                 "Handler": "workspaces-create.handler",
-                "Runtime": "nodejs6.10",
+                "Runtime": "nodejs8.10",
                 "CodeUri": "./lambda/workspaces-create/",
                 "Policies": "AmazonWorkSpacesAdmin",
                 "Environment": {
@@ -99,7 +99,7 @@
             "Type": "AWS::Serverless::Function",
             "Properties": {
                 "Handler": "workspaces-approval.handler",
-                "Runtime": "nodejs6.10",
+                "Runtime": "nodejs8.10",
                 "CodeUri": "./lambda/workspaces-approval/",
                 "Timeout": 75,
                 "Policies": "AdministratorAccess",
@@ -134,7 +134,7 @@
             "DependsOn": "WorkspaceDetailsTable",
             "Properties": {
                 "Handler": "workspaces-details.handler",
-                "Runtime": "nodejs6.10",
+                "Runtime": "nodejs8.10",
                 "CodeUri": "./lambda/workspaces-details/",
                 "Policies": "AmazonDynamoDBFullAccess",
                 "Environment": {

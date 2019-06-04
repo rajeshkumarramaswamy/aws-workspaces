@@ -4,7 +4,7 @@
     "Parameters": {
         "AppName": {
             "Type": "String",
-            "Description": "Name of the application.",
+            "Description": "portal-workspaces",
             "MinLength": "1",
             "MaxLength": "80",
             "AllowedPattern": "[A-Za-z0-9-]+",
@@ -14,7 +14,7 @@
             "Description": "Name of the new S3 Bucket to Host Site",
             "Type": "String",
             "AllowedPattern": "[a-z0-9-]+",
-            "Default": "workspaces-serverless-template"
+            "Default": "bucketforworkspaces"
         },
         "CognitoPool": {
             "Description": "Name for the Cognito Pool",
@@ -38,7 +38,7 @@
         },
         "GitHubRepoName": {
             "Type": "String",
-            "Description": "The GitHub repo name"
+            "Description": "aws-workspaces"
         },
         "GitHubRepoBranch": {
             "Type": "String",
@@ -47,12 +47,12 @@
         },
         "GitHubUser": {
             "Type": "String",
-            "Description": "GitHub UserName. This username must have access to the GitHubToken."
+            "Description": "rajeshkumarramaswamy"
         },
         "GitHubToken": {
             "NoEcho": true,
             "Type": "String",
-            "Description": "Secret. OAuthToken with access to Repo. Long string of characters and digits. Go to https://github.com/settings/tokens"
+            "Description": "de4afaf15c9f3993e789f11d95f23367a4457ca1"
         }
     },
     "Resources": {
