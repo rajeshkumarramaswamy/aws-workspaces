@@ -4,7 +4,7 @@ module.exports =
         "httpMethod": "POST",
         "authorizer": {
             "claims": {
-                "email": "earl@eeg3.net"
+                "email": "rajesh.ramaswamy@netenrich.com"
             }
         }
     },

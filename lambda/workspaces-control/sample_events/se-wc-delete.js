@@ -10,10 +10,10 @@ module.exports =
                 "token_use": "id",
                 "auth_time": "1513492092",
                 "iss": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_AmrPIBcWm",
-                "cognito:username": "earl-at-eeg3.net",
+                "cognito:username": "rajesh.ramaswamy@netenrich.com",
                 "exp": "Sun Dec 17 07:28:12 UTC 2017",
                 "iat": "Sun Dec 17 06:28:12 UTC 2017",
-                "email": "earl@eeg3.net"
+                "email": "rajesh.ramaswamy@netenrich.com"
             }
         },
         "httpMethod": "POST"

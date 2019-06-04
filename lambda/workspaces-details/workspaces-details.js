@@ -19,7 +19,7 @@ exports.handler = (event, context, callback) => {
     // DynamoDB Table should consist of a primary key based on the Username and Email have secondary values of Status and WorkspaceId.
 
     // The Lambda will receive parameters in three manners:
-    //  1: JSON when called directly (e.g. "body": "{\"action\":\"put\",\"username\":\"earl\",\"email\":\"earl@eeg3.net\",\"ws_status\":\"Requested\"}" )
+    //  1: JSON when called directly (e.g. "body": "{\"action\":\"put\",\"username\":\"rajesh\",\"email\":\"rajesh.ramaswamy@netenrich.com\",\"ws_status\":\"Requested\"}" )
     //  2: JSON when called indirectly (i.e. the same as #1 except not inside a body parameter)
     //  3: CSV when declined through API Gateway
     // Therefore, do a try/catch in order to find out which one the function is dealing with. If 'action' variable stays undefined, it is through #3 (CSV).
