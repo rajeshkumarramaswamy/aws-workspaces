@@ -1,0 +1,488 @@
+{
+    "Transform": "AWS::Serverless-2016-10-31",
+    "Description": "WorkSpaces Portal Application Stack",
+    "Parameters": {
+        "OriginUrl": {
+            "Description": "The origin url to allow CORS requests from. This will be the base URL of the static website.",
+            "Type": "String",
+            "Default": "*"
+        },
+        "AppName": {
+            "Type": "String",
+            "Description": "Name of the portal.",
+            "MinLength": "1",
+            "MaxLength": "80",
+            "AllowedPattern": "[A-Za-z0-9-]+",
+            "ConstraintDescription": "Malformed input parameter. AppName must only contain upper and lower case letters, numbers, and -.",
+            "Default": "wsPortal"
+        },
+        "PortalEmail": {
+            "Type": "String",
+            "Description": "Address from which emails will be sent from to approvers.",
+            "Default": "approval@roundtower.io"
+        },
+        "ApproverEmail": {
+            "Type": "String",
+            "Description": "Email address that will receive WorkSpace Creation approval requests.",
+            "Default": "earl@eeg3.net"
+        },
+        "DirectoryServicesId": {
+            "Type": "String",
+            "Description": "Directory Services ID configured within Amazon WorkSpaces.",
+            "Default": "d-90672a878e"
+        },
+        "ApprovedDomain": {
+            "Type": "String",
+            "Description": "Approved email domain that can sign up for Portal access.",
+            "Default": "eeg3.net"
+        }
+    },
+    "Resources": {
+        "cogDomainVerify": {
+            "Type": "AWS::Serverless::Function",
+            "Properties": {
+                "Handler": "cogDomainVerify.handler",
+                "Runtime": "nodejs6.10",
+                "CodeUri": "./lambda/cognito-domainVerify/",
+                "Environment": {
+                    "Variables": {
+                        "APPROVED_DOMAIN": {
+                            "Ref": "ApprovedDomain"
+                        }
+                    }
+                }
+            }
+        },
+        "workspacesControl": {
+            "Type": "AWS::Serverless::Function",
+            "Properties": {
+                "Handler": "workspaces-control.handler",
+                "Runtime": "nodejs6.10",
+                "CodeUri": "./lambda/workspaces-control/",
+                "Timeout": 5,
+                "Policies": ["AmazonWorkSpacesAdmin", "AWSStepFunctionsFullAccess", "AWSLambdaRole"],
+                "Environment": {
+                    "Variables": {
+                        "ORIGIN_URL": {
+                            "Ref": "OriginUrl"
+                        },
+                        "STATE_MACHINE_ARN": {
+                            "Ref": "approvalStateMachine"
+                        },
+                        "DETAILS_LAMBDA": {
+                            "Ref": "workspacesDetails"
+                        }
+                    }
+                }
+            }
+        },
+        "workspacesCreate": {
+            "Type": "AWS::Serverless::Function",
+            "Properties": {
+                "Handler": "workspaces-create.handler",
+                "Runtime": "nodejs6.10",
+                "CodeUri": "./lambda/workspaces-create/",
+                "Policies": "AmazonWorkSpacesAdmin",
+                "Environment": {
+                    "Variables": {
+                        "ORIGIN_URL": {
+                            "Ref": "OriginUrl"
+                        },
+                        "DIRECTORY_ID": {
+                            "Ref": "DirectoryServicesId"
+                        }
+                    }
+                }
+            }
+        },
+        "workspacesAppoval": {
+            "Type": "AWS::Serverless::Function",
+            "Properties": {
+                "Handler": "workspaces-approval.handler",
+                "Runtime": "nodejs6.10",
+                "CodeUri": "./lambda/workspaces-approval/",
+                "Timeout": 75,
+                "Policies": "AdministratorAccess",
+                "Environment": {
+                    "Variables": {
+                        "TASK_ARN": {
+                            "Ref": "approvalManualActivity"
+                        },
+                        "API_DEPLOYMENT_ID": {
+                            "Ref": "approvalResponderAPI"
+                        },
+                        "FROM_ADDRESS": {
+                            "Ref": "PortalEmail"
+                        },
+                        "APPROVER_EMAIL_ADDRESS": {
+                            "Ref": "ApproverEmail"
+                        }
+                    }
+                },
+                "Events": {
+                    "Timer": {
+                        "Type": "Schedule",
+                        "Properties": {
+                            "Schedule": "rate(5 minutes)"
+                        }
+                    }
+                }
+            }
+        },
+        "workspacesDetails": {
+            "Type": "AWS::Serverless::Function",
+            "DependsOn": "WorkspaceDetailsTable",
+            "Properties": {
+                "Handler": "workspaces-details.handler",
+                "Runtime": "nodejs6.10",
+                "CodeUri": "./lambda/workspaces-details/",
+                "Policies": "AmazonDynamoDBFullAccess",
+                "Environment": {
+                    "Variables": {
+                        "ORIGIN_URL": {
+                            "Ref": "OriginUrl"
+                        },
+                        "DETAILS_TABLE_NAME": {
+                            "Ref": "WorkspaceDetailsTable"
+                        }
+                    }
+                }
+            }
+        },
+        "approvalStepFunctionsRole": {
+            "Description": "Creating service role in IAM for Step Functions",
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "RoleName": {
+                    "Fn::Sub": "${AppName}-${AWS::Region}-sfn-role"
+                },
+                "AssumeRolePolicyDocument": {
+                    "Statement": [{
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": [{
+                                "Fn::Sub": "states.${AWS::Region}.amazonaws.com"
+                            }]
+                        },
+                        "Action": "sts:AssumeRole"
+                    }]
+                },
+                "Path": "/",
+                "Policies": [{
+                    "PolicyName": "workspaceCreateInvoke",
+                    "PolicyDocument": {
+                        "Statement": [{
+                            "Effect": "Allow",
+                            "Action": "lambda:InvokeFunction",
+                            "Resource": [{
+                                "Fn::GetAtt": ["workspacesCreate", "Arn"]
+                            },
+                            {
+                                "Fn::GetAtt": ["workspacesDetails", "Arn"]
+                            }]
+                        }]
+                    }
+                }]
+            }
+        },
+        "approvalAPIGatewayRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "RoleName": {
+                    "Fn::Sub": "${AppName}-${AWS::Region}-apigw-role"
+                },
+                "AssumeRolePolicyDocument": {
+                    "Statement": [{
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": "apigateway.amazonaws.com"
+                        },
+                        "Action": "sts:AssumeRole"
+                    }]
+                },
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
+                    "arn:aws:iam::aws:policy/AWSStepFunctionsFullAccess"
+                ]
+            }
+        },
+        "approvalManualActivity": {
+            "Type": "AWS::StepFunctions::Activity",
+            "Properties": {
+                "Name": {
+                    "Fn::Sub": "${AppName}-Step"
+                }
+            }
+        },
+        "approvalStateMachine": {
+            "Type": "AWS::StepFunctions::StateMachine",
+            "Properties": {
+                "StateMachineName": {
+                    "Fn::Sub": "${AppName}-StateMachine"
+                },
+                "DefinitionString": {
+                    "Fn::Join": ["", ["{ \"StartAt\": \"WorkspaceApproval\", \"States\": { \"WorkspaceApproval\": { \"Type\": \"Parallel\", \"Branches\": [{ \"StartAt\": \"approvalManualActivity\", \"States\": { \"approvalManualActivity\": { \"Type\": \"Task\", \"Resource\": \"",
+                        {
+                            "Ref": "approvalManualActivity"
+                        },
+                        "\", \"TimeoutSeconds\": 3600, \"Catch\": [{ \"ErrorEquals\": [\"States.TaskFailed\"], \"Next\": \"updateFinalWSDetailStatus\" }], \"Next\": \"workspacesCreate\" }, \"workspacesCreate\": { \"Type\": \"Task\", \"Resource\": \"",
+                        {
+                            "Fn::GetAtt": ["workspacesCreate", "Arn"]
+                        },
+                        "\", \"Next\": \"updateFinalWSDetailStatus\" }, \"updateFinalWSDetailStatus\": { \"Type\": \"Task\", \"Resource\": \"",
+                        {
+                            "Fn::GetAtt": ["workspacesDetails", "Arn"]
+                        },
+                        "\", \"End\": true } } }, { \"StartAt\": \"updateInitialWSDetailStatus\", \"States\": { \"updateInitialWSDetailStatus\": { \"Type\": \"Task\", \"Resource\": \"",
+                        {
+                            "Fn::GetAtt": ["workspacesDetails", "Arn"]
+                        },
+                        "\", \"End\": true } } }], \"End\": true } } }"
+                    ]]
+                },
+                "RoleArn": {
+                    "Fn::GetAtt": ["approvalStepFunctionsRole", "Arn"]
+                }
+            }
+        },
+        "approvalResponderAPI": {
+            "Type": "AWS::ApiGateway::RestApi",
+            "Properties": {
+                "Body": {
+                    "swagger": "2.0",
+                    "info": {
+                        "version": "2017-12-20T19:01:15Z",
+                        "title": "ApprovalResponderAPI"
+                    },
+                    "basePath": "/respond",
+                    "schemes": [
+                        "https"
+                    ],
+                    "paths": {
+                        "/fail": {
+                            "get": {
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ],
+                                "parameters": [{
+                                    "name": "taskToken",
+                                    "in": "query",
+                                    "required": false,
+                                    "type": "string"
+                                }],
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "x-amazon-apigateway-integration": {
+                                    "credentials": {
+                                        "Fn::GetAtt": ["approvalAPIGatewayRole", "Arn"]
+                                    },
+                                    "responses": {
+                                        "default": {
+                                            "statusCode": "200"
+                                        }
+                                    },
+                                    "uri": {
+                                        "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:states:action/SendTaskFailure"
+                                    },
+                                    "passthroughBehavior": "when_no_templates",
+                                    "httpMethod": "POST",
+                                    "requestTemplates": {
+                                        "application/json": "{\n   \"error\": \"Rejected\",\n   \"cause\": \"$input.params('requesterEmailAddress'),$input.params('requesterUsername')\",\n   \"taskToken\": \"$input.params('taskToken')\"\n}"
+                                    },
+                                    "type": "aws"
+                                }
+                            },
+                            "options": {
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ],
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        },
+                                        "headers": {
+                                            "Access-Control-Allow-Origin": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Methods": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Headers": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                },
+                                "x-amazon-apigateway-integration": {
+                                    "responses": {
+                                        "default": {
+                                            "statusCode": "200",
+                                            "responseParameters": {
+                                                "method.response.header.Access-Control-Allow-Methods": "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
+                                                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                                                "method.response.header.Access-Control-Allow-Origin": "'*'"
+                                            }
+                                        }
+                                    },
+                                    "passthroughBehavior": "when_no_match",
+                                    "requestTemplates": {
+                                        "application/json": "{\"statusCode\": 200}"
+                                    },
+                                    "type": "mock"
+                                }
+                            }
+                        },
+                        "/succeed": {
+                            "get": {
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ],
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "x-amazon-apigateway-integration": {
+                                    "credentials": {
+                                        "Fn::GetAtt": ["approvalAPIGatewayRole", "Arn"]
+                                    },
+                                    "responses": {
+                                        "default": {
+                                            "statusCode": "200"
+                                        }
+                                    },
+                                    "uri": {
+                                        "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:states:action/SendTaskSuccess"
+                                    },
+                                    "passthroughBehavior": "when_no_templates",
+                                    "httpMethod": "POST",
+                                    "requestTemplates": {
+                                        "application/json": "{\n   \"output\": \"\\\"$input.params('requesterEmailAddress'),$input.params('requesterUsername'),$input.params('requesterBundle')\\\"\",\n   \"taskToken\": \"$input.params('taskToken')\"\n}"
+                                    },
+                                    "type": "aws"
+                                }
+                            },
+                            "options": {
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ],
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        },
+                                        "headers": {
+                                            "Access-Control-Allow-Origin": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Methods": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Headers": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                },
+                                "x-amazon-apigateway-integration": {
+                                    "responses": {
+                                        "default": {
+                                            "statusCode": "200",
+                                            "responseParameters": {
+                                                "method.response.header.Access-Control-Allow-Methods": "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
+                                                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                                                "method.response.header.Access-Control-Allow-Origin": "'*'"
+                                            }
+                                        }
+                                    },
+                                    "passthroughBehavior": "when_no_match",
+                                    "requestTemplates": {
+                                        "application/json": "{\"statusCode\": 200}"
+                                    },
+                                    "type": "mock"
+                                }
+                            }
+                        }
+                    },
+                    "definitions": {
+                        "Empty": {
+                            "type": "object",
+                            "title": "Empty Schema"
+                        }
+                    }
+                },
+                "Description": "Approval Responder API",
+                "Name": "approvalResponderAPI"
+            }
+        },
+        "approvalApiDeployment": {
+            "Type": "AWS::ApiGateway::Deployment",
+            "Properties": {
+                "RestApiId": {
+                    "Ref": "approvalResponderAPI"
+                },
+                "Description": "Respond Deployment",
+                "StageName": "respond"
+            }
+        },
+        "WorkspaceDetailsTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+                "AttributeDefinitions": [{
+                        "AttributeName": "Email",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "Username",
+                        "AttributeType": "S"
+                    }
+                ],
+                "KeySchema": [{
+                        "AttributeName": "Email",
+                        "KeyType": "HASH"
+                    },
+                    {
+                        "AttributeName": "Username",
+                        "KeyType": "RANGE"
+                    }
+                ],
+                "ProvisionedThroughput": {
+                    "ReadCapacityUnits": "5",
+                    "WriteCapacityUnits": "5"
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "WorkspaceDetailsTable": {
+            "Value": {
+                "Ref": "WorkspaceDetailsTable"
+            },
+            "Description": "Table name for WorkSpace Details"
+        }
+    }
+}

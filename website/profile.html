@@ -1,0 +1,76 @@
+---
+title: User Profile
+layout: default
+---
+
+<!-- Main jumbotron -->
+<div class="jumbotron">
+  <h1 class="display-4">
+    <strong>{{page.title}}</strong>
+  </h1>
+
+  <p class="lead">
+    Request, Reboot, Rebuild, and Decommission your Amazon WorkSpace.
+  </p>
+  <p class="lead">
+    The documentation (i.e. setup instructions, modification details) and full source code for this template as well as the pipeline
+    that powers it is available within the GitHub repository.
+  </p>
+  <a href="https://github.com/eeg3/workspaces-portal" class="btn btn-outline-primary">View Source Code</a>
+  </p>
+</div>
+
+<div class="row">
+  <div class="col-sm-12 mr-auto ml-auto">
+    <div class="card border-dark">
+      <div class="card-header bg-primary text-white">
+        User Profile
+      </div>
+      <div class="card-body text-center">
+        <h5 class="card-subtitle mb-2">Authentication Token</h4>
+          <textarea class="authToken" cols="80" rows="3"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="noApiMessage" class="configMessage" style="display: none;">
+  <div class="backdrop"></div>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">Successfully Authenticated!</h3>
+    </div>
+    <div class="panel-body">
+      <p>This page is not functional yet because there is no API invoke URL configured in
+        <a href="/js/config.js">/js/config.js</a>.</p>
+      <p>In the meantime, in order to test the Amazon Cognito user pool authorizer for your API, use the auth token below:</p>
+      <textarea class="authToken"></textarea>
+    </div>
+  </div>
+</div>
+
+<div id="noCognitoMessage" class="configMessage" style="display: none;">
+  <div class="backdrop"></div>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">No Cognito User Pool Configured</h3>
+    </div>
+    <div class="panel-body">
+      <p>There is no user pool configured in
+        <a href="/js/config.js">/js/config.js</a>.</p>
+    </div>
+  </div>
+</div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+<script src="js/vendor/aws-cognito-sdk.min.js"></script>
+<script src="js/vendor/amazon-cognito-identity.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/cognito-auth.js"></script>
+<script src="js/profile.js"></script>

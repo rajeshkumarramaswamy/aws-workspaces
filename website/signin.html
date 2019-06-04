@@ -1,0 +1,53 @@
+---
+title: Login
+layout: default
+---
+
+<!-- Main jumbotron -->
+<div class="jumbotron">
+  <h1 class="display-4">
+    <strong>{{page.title}}</strong>
+  </h1>
+
+  <p class="lead">
+    Authentication for this site uses AWS
+    <a href="https://aws.amazon.com/cognito/">Cognito</a> in order to provide access through the
+    <a href="https://aws.amazon.com/api-gateway/">API Gateway</a> powering the
+    <a href="https://aws.amazon.com/lambda/">Lambda</a> functions with the site's dynamic content. The documentation (i.e. setup instructions, modification details)
+    and full source code for this site as well as the pipeline that powers it is available within the GitHub repository.
+  </p>
+  <a href="https://github.com/eeg3/workspaces-portal" class="btn btn-outline-primary">View Source Code</a>
+</div>
+
+<div class="row">
+  <div class="col-md-8 col-lg-6 mr-auto ml-auto">
+      <div class="card border-dark">
+          <div class="card-header bg-primary text-white">
+            Authenticate
+          </div>
+          <div class="card-body">
+            <h5 class="card-subtitle mb-2">Sign-In</h4>
+              <form id="signinForm">
+                <div class="form-group">
+                  <input type="text" id="emailInputSignin" class="form-control form-control-sm" placeholder="Email Address" required>
+                  <input type="password" id="passwordInputSignin" class="form-control form-control-sm" placeholder="Password" required>
+                </div>
+                <input class="btn btn-outline-primary" type="submit" value="Sign In">
+              </form>
+          </div>
+        </div>
+  </div>
+</div>
+
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+<script src="js/vendor/aws-cognito-sdk.min.js"></script>
+<script src="js/vendor/amazon-cognito-identity.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/cognito-auth.js"></script>

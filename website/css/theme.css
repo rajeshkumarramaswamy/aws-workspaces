@@ -1,0 +1,45 @@
+body {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.theme-showcase>p>.btn {
+  margin: 5px 0;
+}
+
+#loadDiv,
+#rebootWorkSpace,
+#requestWorkSpace,
+#rebuildWorkSpace,
+#decommissionWorkSpace,
+#confirmDecommissionWorkSpace {
+  text-align: center
+}
+
+#registrationForm,
+#signinForm,
+#verifyForm {
+  text-align: center
+}
+
+.authenticated {
+  display: none !important;
+}
+
+#reloadButton {
+    background:none!important;
+    color:inherit;
+    border:none; 
+    padding:0!important;
+    font: inherit;
+    cursor: pointer;
+}
+
+.methodMessage {
+  text-align: left;
+  margin-top: 6px;
+}
+
+.methodCommand {
+  text-align: right;
+}
