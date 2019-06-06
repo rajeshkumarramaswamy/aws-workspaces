@@ -7,6 +7,10 @@ body {
   background-color: #dee1dc;
 }
 
+.dropdown-menu {
+  left: -107px!important;
+}
+
 .theme-showcase>p>.btn {
   margin: 5px 0;
 }
