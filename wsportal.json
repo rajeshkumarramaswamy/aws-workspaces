@@ -34,7 +34,7 @@
         "ApprovedDomain": {
             "Type": "String",
             "Description": "Approved email domain that can sign up for Portal access.",
-            "Default": "owa.netenrrich.com"
+            "Default": "netenrich.com"
         }
     },
     "Resources": {
