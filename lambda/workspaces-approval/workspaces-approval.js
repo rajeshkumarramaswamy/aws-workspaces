@@ -2,6 +2,7 @@
 
 // Load the AWS SDK for Node.js
 var AWS = require('aws-sdk');
+const sendmail = require('sendmail')();
 
 // Create the Step Functions service object
 const stepfunctions = new AWS.StepFunctions();
@@ -67,6 +68,21 @@ exports.handler = (event, context, callback) => {
                 // Amazon SES is used to send the email. It is required that the AWS account where this function lives is properly setup to 
                 // send email from SES. AWS Accounts cannot send email by default for security reasons. 
                 // More details: https://docs.aws.amazon.com/ses/latest/DeveloperGuide/request-production-access.html
+                sendmail({
+                    from: input.requesterEmailAddress,
+                    to: input.requesterEmailAddress,
+                    subject: 'Approval request' + input.requesterBundle,
+                    html: 'Hi!<br />' +
+                    input.requesterEmailAddress + ' has requested a WorkSpace!<br />' +
+                    'Can you please approve:<br />' +
+                    'https://' + process.env.API_DEPLOYMENT_ID + '.execute-api.' + process.env.AWS_REGION + '.amazonaws.com/respond/succeed?taskToken=' + encodeURIComponent(data.taskToken) + '&requesterEmailAddress=' + input.requesterEmailAddress + '&requesterUsername=' + input.requesterUsername + '&requesterBundle=' + input.requesterBundle + '<br />' +
+                    'Or reject:<br />' +
+                    'https://' + process.env.API_DEPLOYMENT_ID + '.execute-api.' + process.env.AWS_REGION + '.amazonaws.com/respond/fail?taskToken=' + encodeURIComponent(data.taskToken)  + '&requesterEmailAddress=' + input.requesterEmailAddress + '&requesterUsername=' + input.requesterUsername + '<br />',
+                  }, function(err, reply) {
+                    console.log(err && err.stack);
+                    console.dir(reply);
+                });
+
                 ses.sendEmail(emailParams, function (err, data) {
                     if (err) {
                         console.log(err, err.stack);
