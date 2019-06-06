@@ -19,7 +19,7 @@
         "PortalEmail": {
             "Type": "String",
             "Description": "Address from which emails will be sent from to approvers.",
-            "Default": "rajesh.ramaswamy@netenrich.com"
+            "Default": "raj9r9@gmail.com"
         },
         "ApproverEmail": {
             "Type": "String",
