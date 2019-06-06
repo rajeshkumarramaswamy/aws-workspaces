@@ -20,8 +20,11 @@
 </head>
 
 <body>
+  <header>
+      {% include navbar.html %}
+  </header>
   <div class="container theme-showcase" role="main">
-    {% include navbar.html %} {% include cognito.html %} {{ content }}
+     {% include cognito.html %} {{ content }}
   </div>
   <!-- /container -->
 </body>
