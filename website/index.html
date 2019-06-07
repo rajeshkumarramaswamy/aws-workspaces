@@ -21,8 +21,7 @@ layout: default
 </div> -->
 
 <!-- Place alerts in this div. -->
-<div id="methodStatus">
-</div>
+
 
 <!-- Show a loading div before AJAX call, and hide it after. -->
 <div id="loadDiv" class="row">
@@ -35,7 +34,7 @@ layout: default
 <div class="row" id="desktopNoExist" hidden>
     <div class="col-md-8 col-lg-6 mr-auto ml-auto">
         <div class="card border-dark">
-            <div class="card-header bg-default text-black">
+            <div class="card-header bg-primary text-white">
               Request WorkSpace
             </div>
             <div class="card-body">
@@ -45,6 +44,7 @@ layout: default
                         <input type="text" id="reqUsername" class="form-control form-control-sm" placeholder="Directory Username" required>
 
                       </div>
+                      <br>
                       <div class="mt-1">
                         <!-- Populated based on Bundles available. -->
                         <select id="reqBundle" />
@@ -63,6 +63,9 @@ layout: default
           </div>
     </div>
   </div>
+
+  <div id="methodStatus">
+    </div>
 
 
   <div class="row" id="desktopExist" hidden>
