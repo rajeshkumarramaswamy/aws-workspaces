@@ -2,6 +2,10 @@ body {
   padding-bottom: 20px;
 }
 
+.bg-custom {
+  background-color: #01598A
+}
+
 .navbackcol {
   background-color: #dee1dc;
 }
