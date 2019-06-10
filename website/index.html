@@ -33,9 +33,11 @@ layout: default
 <!-- If no provisioned desktop exists for the user, show the request panel. -->
 <div class="container">
 <div class="row" id="desktopNoExist" hidden style="margin-top: 20px">
-    <div class="col" style="font-size: 30px;background-image: url('/images/paper.jpg')">
+    <div class="col" id="indexcard">
         <div style="font-weight: bold; margin: 82px;">
             Request WorkSpace
+            <hr style="border-top: 2px solid rgba(0,0,0,2)">
+            <span>Use this form to request WorkSpaces</span>
         </div>
     </div>
     <div class="col">
@@ -58,7 +60,7 @@ layout: default
                       </div>
                       <br>
                       <div>
-                        <button id="reqButton" class="btn btn-primary" type="submit" name="submit">
+                        <button id="reqButton" class="btn btn-primary bg-custom" type="submit" name="submit">
                           <span>Create WorkSpace</span>
                           <i></i>
                         </button>

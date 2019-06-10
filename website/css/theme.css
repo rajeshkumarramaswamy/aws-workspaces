@@ -6,6 +6,11 @@ body {
   background-color: #01598A
 }
 
+#indexcard {
+  font-size: 30px;
+  background-image: url('/images/paper.jpg')
+}
+
 .navbackcol {
   background-color: #dee1dc;
 }
