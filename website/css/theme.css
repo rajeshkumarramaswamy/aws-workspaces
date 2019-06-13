@@ -8,7 +8,8 @@ body {
 
 #indexcard {
   font-size: 30px;
-  background-image: url('/images/paper.jpg')
+  background-image: url('/images/paper.jpg');
+  text-align: center;
 }
 
 .navbackcol {
