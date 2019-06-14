@@ -14,6 +14,17 @@ var stepfunctions = new AWS.StepFunctions();
 // Create the Lambda service object
 var lambda = new AWS.Lambda();
 
+var workspaces = new AWS.WorkSpaces({
+    apiVersion: '2015-04-08'
+});
+
+var config = {
+    Directory: process.env.DIRECTORY_ID || 'd-90673ae74e',
+    Mode: 'AUTO_STOP',
+    UsageTimeout: 60
+}
+
+
 exports.handler = (event, context, callback) => {
     var originURL = process.env.ORIGIN_URL || "*"; // Origin URL to allow for CORS
     var stateMachine =
@@ -23,7 +34,7 @@ exports.handler = (event, context, callback) => {
         process.env.DETAILS_LAMBDA ||
         "wsp-db-int-serverless-stack-workspacesDetails-1J4ZB3URZF2QP";
 
-    console.log("Received event:", JSON.stringify(event, null, 2)); // Output log for debugging purposes.
+    console.log("Received event:", JSON.stringify(event)); // Output log for debugging purposes.
 
     // The 'action' parameter specifies what workspaces control should do. Accepted values: list, acknowledge, create, rebuild, reboot, delete, bundles.
     var action = JSON.parse(event.body)["action"];
@@ -184,30 +195,84 @@ exports.handler = (event, context, callback) => {
         // the process ends. If the Approver approves, the next State Machine calls another Lambda function 'workspaces-create' that
         // actually handles creating the WorkSpace.
 
-        var stepParams = {
-            stateMachineArn: stateMachine,
-            /* required */
-            input: JSON.stringify({
-                action: "put",
-                requesterEmailAddress: event.requestContext.authorizer.claims.email,
-                requesterUsername: JSON.parse(event.body)["username"],
-                requesterBundle: JSON.parse(event.body)["bundle"],
-                ws_status: "Requested"
-            })
+        // var stepParams = {
+        //     stateMachineArn: stateMachine,
+        //     /* required */
+        //     input: JSON.stringify({
+        //         action: "put",
+        //         requesterEmailAddress: event.requestContext.authorizer.claims.email,
+        //         requesterUsername: JSON.parse(event.body)["username"],
+        //         requesterBundle: JSON.parse(event.body)["bundle"],
+        //         ws_status: "Requested"
+        //     })
+        // };
+        // stepfunctions.startExecution(stepParams, function (err, data) {
+        //     if (err) {
+        //         console.log(err, err.stack);
+        //     } else {
+        //         console.log('+++++++++++++++++++++++', data);
+        //         callback(null, {
+        //             statusCode: 200,
+        //             body: JSON.stringify({
+        //                 Result: data
+        //             }),
+        //             headers: {
+        //                 "Access-Control-Allow-Origin": "*"
+        //             }
+        //         });
+        //     }
+        // });
+
+        var originURL = process.env.ORIGIN_URL || '*';
+
+        console.log("Received event: " + event);
+    
+        var requesterEmail = event.requestContext.authorizer.claims.email;
+        var requesterUsername = JSON.parse(event.body)["username"];
+        var requesterBundle = JSON.parse(event.body)["bundle"];
+    
+        console.log("Requester email: " + requesterEmail);
+        console.log("Requester username: " + requesterUsername);
+        console.log("Requester bundle: " + requesterBundle);
+    
+        var params = {
+            Workspaces: [{
+                BundleId: requesterBundle,
+                DirectoryId: config.Directory,
+                UserName: requesterUsername,
+                Tags: [{
+                    Key: 'SelfServiceManaged',
+                    Value: requesterEmail
+                }, ],
+                WorkspaceProperties: {
+                    RunningMode: config.Mode,
+                    RunningModeAutoStopTimeoutInMinutes: config.UsageTimeout
+                }
+            }]
         };
-        stepfunctions.startExecution(stepParams, function (err, data) {
+    
+        workspaces.createWorkspaces(params, function (err, data) {
             if (err) {
-                console.log(err, err.stack);
-            } else {
-                console.log(data);
+                console.log("Error: " + err);
                 callback(null, {
-                    statusCode: 200,
+                    statusCode: 500,
                     body: JSON.stringify({
-                        Result: data
+                        Error: err,
                     }),
                     headers: {
-                        "Access-Control-Allow-Origin": "*"
-                    }
+                        'Access-Control-Allow-Origin': '*',
+                    },
+                });
+            } else {
+                console.log("Result workpacessss: " + JSON.stringify(data));
+                callback(null, {
+                    "statusCode": 200,
+                    "body": JSON.stringify({
+                        "action": "put",
+                        "requesterEmailAddress": requesterEmail,
+                        "requesterUsername": requesterUsername,
+                        "ws_status": "Approved"
+                    })
                 });
             }
         });
