@@ -195,87 +195,87 @@ exports.handler = (event, context, callback) => {
         // the process ends. If the Approver approves, the next State Machine calls another Lambda function 'workspaces-create' that
         // actually handles creating the WorkSpace.
 
-        // var stepParams = {
-        //     stateMachineArn: stateMachine,
-        //     /* required */
-        //     input: JSON.stringify({
-        //         action: "put",
-        //         requesterEmailAddress: event.requestContext.authorizer.claims.email,
-        //         requesterUsername: JSON.parse(event.body)["username"],
-        //         requesterBundle: JSON.parse(event.body)["bundle"],
-        //         ws_status: "Requested"
-        //     })
-        // };
-        // stepfunctions.startExecution(stepParams, function (err, data) {
-        //     if (err) {
-        //         console.log(err, err.stack);
-        //     } else {
-        //         console.log('+++++++++++++++++++++++', data);
-        //         callback(null, {
-        //             statusCode: 200,
-        //             body: JSON.stringify({
-        //                 Result: data
-        //             }),
-        //             headers: {
-        //                 "Access-Control-Allow-Origin": "*"
-        //             }
-        //         });
-        //     }
-        // });
-
-        var originURL = process.env.ORIGIN_URL || '*';
-
-        console.log("Received event: " + event);
-    
-        var requesterEmail = event.requestContext.authorizer.claims.email;
-        var requesterUsername = JSON.parse(event.body)["username"];
-        var requesterBundle = JSON.parse(event.body)["bundle"];
-    
-        console.log("Requester email: " + requesterEmail);
-        console.log("Requester username: " + requesterUsername);
-        console.log("Requester bundle: " + requesterBundle);
-    
-        var params = {
-            Workspaces: [{
-                BundleId: requesterBundle,
-                DirectoryId: config.Directory,
-                UserName: requesterUsername,
-                Tags: [{
-                    Key: 'SelfServiceManaged',
-                    Value: requesterEmail
-                }, ],
-                WorkspaceProperties: {
-                    RunningMode: config.Mode,
-                    RunningModeAutoStopTimeoutInMinutes: config.UsageTimeout
-                }
-            }]
+        var stepParams = {
+            stateMachineArn: stateMachine,
+            /* required */
+            input: JSON.stringify({
+                action: "put",
+                requesterEmailAddress: event.requestContext.authorizer.claims.email,
+                requesterUsername: JSON.parse(event.body)["username"],
+                requesterBundle: JSON.parse(event.body)["bundle"],
+                ws_status: "Requested"
+            })
         };
-    
-        workspaces.createWorkspaces(params, function (err, data) {
+        stepfunctions.startExecution(stepParams, function (err, data) {
             if (err) {
-                console.log("Error: " + err);
+                console.log(err, err.stack);
+            } else {
+                console.log('+++++++++++++++++++++++', data);
                 callback(null, {
-                    statusCode: 500,
+                    statusCode: 200,
                     body: JSON.stringify({
-                        Error: err,
+                        Result: data
                     }),
                     headers: {
-                        'Access-Control-Allow-Origin': '*',
-                    },
-                });
-            } else {
-                console.log("Result workpacessss: " + JSON.stringify(data));
-                callback(null, {
-                    "statusCode": 200,
-                    "body": JSON.stringify({
-                        "action": "put",
-                        "requesterEmailAddress": requesterEmail,
-                        "requesterUsername": requesterUsername,
-                        "ws_status": "Approved"
-                    })
+                        "Access-Control-Allow-Origin": "*"
+                    }
                 });
             }
         });
+
+        // var originURL = process.env.ORIGIN_URL || '*';
+
+        // console.log("Received event: " + event);
+    
+        // var requesterEmail = event.requestContext.authorizer.claims.email;
+        // var requesterUsername = JSON.parse(event.body)["username"];
+        // var requesterBundle = JSON.parse(event.body)["bundle"];
+    
+        // console.log("Requester email: " + requesterEmail);
+        // console.log("Requester username: " + requesterUsername);
+        // console.log("Requester bundle: " + requesterBundle);
+    
+        // var params = {
+        //     Workspaces: [{
+        //         BundleId: requesterBundle,
+        //         DirectoryId: config.Directory,
+        //         UserName: requesterUsername,
+        //         Tags: [{
+        //             Key: 'SelfServiceManaged',
+        //             Value: requesterEmail
+        //         }, ],
+        //         WorkspaceProperties: {
+        //             RunningMode: config.Mode,
+        //             RunningModeAutoStopTimeoutInMinutes: config.UsageTimeout
+        //         }
+        //     }]
+        // };
+    
+        // workspaces.createWorkspaces(params, function (err, data) {
+        //     if (err) {
+        //         console.log("Error: " + err);
+        //         callback(null, {
+        //             statusCode: 500,
+        //             body: JSON.stringify({
+        //                 Error: err,
+        //             }),
+        //             headers: {
+        //                 'Access-Control-Allow-Origin': '*',
+        //             },
+        //         });
+        //     } else {
+        //         console.log("Result workpacessss: " + JSON.stringify(data));
+        //         callback(null, {
+        //             "statusCode": 200,
+        //             "body": JSON.stringify({
+        //                 "action": "put",
+        //                 "requesterEmailAddress": requesterEmail,
+        //                 "requesterUsername": requesterUsername,
+        //                 "ws_status": "Approved"
+        //             })
+        //         });
+        //     }
+        // });
     } else if (action == "rebuild") {
         // 'rebuild' handles rebuilding the WorkSpace assigned to the user that submits the API call.
         // A rebuild function resets the WorkSpace back to its original state. Applications or system settings changes
