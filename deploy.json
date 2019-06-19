@@ -4,7 +4,7 @@
     "Parameters": {
         "AppName": {
             "Type": "String",
-            "Description": "workspaces-aws",
+            "Description": "selfservice-workspaces",
             "MinLength": "1",
             "MaxLength": "80",
             "AllowedPattern": "[A-Za-z0-9-]+",
@@ -14,7 +14,7 @@
             "Description": "Name of the new S3 Bucket to Host Site",
             "Type": "String",
             "AllowedPattern": "[a-z0-9-]+",
-            "Default": "bucketforworkspaces"
+            "Default": "selfservicebucket"
         },
         "CognitoPool": {
             "Description": "Name for the Cognito Pool",
@@ -52,7 +52,7 @@
         "GitHubToken": {
             "NoEcho": true,
             "Type": "String",
-            "Description": "de03c64167b50ccd826dc33c3ce7ae3cf46f6d2e"
+            "Description": "5683124a886c7d2b5bc87f30e98d56fb7757bd77"
         }
     },
     "Resources": {
