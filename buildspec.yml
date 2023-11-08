@@ -12,7 +12,7 @@ containers:
                     - for i in ./lambda/*; do if [ -d "$i" ] && [ -f "$i/package.json" ]; then (cd "$i" && npm install) fi done
                     - apt update
                     - apt install jekyll -y
-                    - apt install python-pip python-dev build-essential -y
+                    - apt install python3-pip  python-dev-is-python3 build-essential -y
                     - pip install awscli
                     - aws cloudformation package --template $INPUT_FILE --s3-bucket $S3_ARTIFACT_BUCKET --output-template post-package.yaml
                     - jekyll build --source website/ --destination website/_site/
