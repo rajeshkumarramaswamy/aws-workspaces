@@ -9,12 +9,7 @@ containers:
         phases:
             during_build:
                 commands:
-                    - for i in ./lambda/*; do
-  if [ -d "$i" ] && [ -f "$i/package.json" ]; then
-    (cd "$i" && npm install)
-  fi
-done
-
+                    - for i in ./lambda/*; do [ -d "$i"  &&  -f "$i/package.json" ] && cd "$i" && npm install && cd ../..; done
                     - apt update
                     - apt install jekyll -y
                     - apt install python-pip python-dev build-essential -y
