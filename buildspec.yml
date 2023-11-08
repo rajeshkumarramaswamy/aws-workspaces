@@ -13,7 +13,7 @@ containers:
                     - apt update
                     - apt install jekyll -y
                     - apt install python3-pip  python-dev-is-python3 build-essential -y
-                    - apt install awscli
+                    - apt install awscli -y
                     - aws cloudformation package --template $INPUT_FILE --s3-bucket $S3_ARTIFACT_BUCKET --output-template post-package.yaml
                     - jekyll build --source website/ --destination website/_site/
                     - aws s3 sync website/_site/ "s3://${S3_WEBSITE_BUCKET}"
