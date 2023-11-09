@@ -5,7 +5,7 @@ window._config = {
         region: 'eu-central-1' // e.g. us-east-2
     },
     api: {
-        invokeUrl: 'https://m6kcyp2gx0.execute-api.eu-central-1.amazonaws.com/Prod'
+        invokeUrl: 'https://m6kcyp2gx0.execute-api.eu-central-1.amazonaws.com/Prod' // e.g. https://rc7nyt4tql.execute-api.us-west-2.amazonaws.com/prod',
     },
     approval: {
         email: 'karthickgandhi@karthickgandhi.com'
