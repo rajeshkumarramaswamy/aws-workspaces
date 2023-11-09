@@ -19,12 +19,12 @@
         "PortalEmail": {
             "Type": "String",
             "Description": "Address from which emails will be sent from to approvers.",
-            "Default": "rajesh.ramaswamy@netenrich.com"
+            "Default": "karthickgandhi@karthickgandhi.com"
         },
         "ApproverEmail": {
             "Type": "String",
             "Description": "Email address that will receive WorkSpace Creation approval requests.",
-            "Default": "rajesh.ramaswamy@netenrich.com"
+            "Default": "karthickgandhi@karthickgandhi.com"
         },
         "DirectoryServicesId": {
             "Type": "String",
@@ -34,7 +34,7 @@
         "ApprovedDomain": {
             "Type": "String",
             "Description": "Approved email domain that can sign up for Portal access.",
-            "Default": "netenrich.com"
+            "Default": "karthickgandhi.com"
         }
     },
     "Resources": {
