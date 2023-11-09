@@ -41,7 +41,7 @@
               }
             }
           },
-          "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:<ACCOUNT ID>:function:workspaces-portal-serverless-sta-workspacesControl-ABCDEFGH/invocations",
+          "uri": "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:<ACCOUNT ID>:function:workspaces-portal-serverless-sta-workspacesControl-ABCDEFGH/invocations",
           "passthroughBehavior": "when_no_match",
           "httpMethod": "POST",
           "contentHandling": "CONVERT_TO_TEXT",
@@ -102,7 +102,7 @@
       "x-amazon-apigateway-authtype": "cognito_user_pools",
       "x-amazon-apigateway-authorizer": {
         "providerARNs": [
-          "arn:aws:cognito-idp:us-east-1:<ACCOUNT ID>:userpool/us-east-1_ABCDEFGH"
+          "arn:aws:cognito-idp:eu-central-1:<ACCOUNT ID>:userpool/eu-central-1_ABCDEFGH"
         ],
         "type": "cognito_user_pools"
       }

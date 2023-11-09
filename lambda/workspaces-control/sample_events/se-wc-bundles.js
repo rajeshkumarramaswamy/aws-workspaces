@@ -8,7 +8,7 @@ module.exports = {
                 "event_id": "cd5c1cab-e2ea-11e7-9614-c1a21c8b3f9a",
                 "token_use": "id",
                 "auth_time": "1513492092",
-                "iss": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_AmrPIBcWm",
+                "iss": "https://cognito-idp.eu-central-1.amazonaws.com/eu-central-1_AmrPIBcWm",
                 "cognito:username": "rajesh.ramaswamy@netenrich.com",
                 "exp": "Sun Dec 17 07:28:12 UTC 2017",
                 "iat": "Sun Dec 17 06:28:12 UTC 2017",

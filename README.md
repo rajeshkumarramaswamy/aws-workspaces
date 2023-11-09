@@ -158,7 +158,7 @@ Within the parent Stack, the Outputs tab should display the following items:
 3. **UserPoolId**
 4. **OriginURL**
 
-The `UserPoolClientId` and `UserPoolId` should be placed into the `website/js/config.js` file within the `cognito.userPoolId` and `cognito.userPoolClientId` so that the website knows how to use the services provisioned. If not using `us-east-1`, also change the region within `cognito.region` accordingly.
+The `UserPoolClientId` and `UserPoolId` should be placed into the `website/js/config.js` file within the `cognito.userPoolId` and `cognito.userPoolClientId` so that the website knows how to use the services provisioned. If not using `eu-central-1`, also change the region within `cognito.region` accordingly.
 
 #### Configure Approval Email Address
 
@@ -199,7 +199,7 @@ In order to provide HTTPS coverage for the portal, create a CloudFront Web Distr
 
 ### Testing
 
-The site should now work as expected. Browse to the URL defined within `OriginURL` output of the parent CloudFormation stack (e.g. http://s3bucketportalname.s3-website-us-east-1.amazonaws.com), and select "Register" from the top right drop-down (Please note that this will be over HTTP and unencrypted at this point). Enter an email address (within the configured domain inside cogDomainVerify) and password, and select Register. You will receive a verification code from Cognito through email. Once the email is received with the token, select "Verify" from the top right drop-down; on the verify page, enter your email and the verification code provided. At this point, the site will redirect to login. Login with the authentication credentials created. To ensure only users within the specified domain can register for the portal, test registering with an email address on an unapproved domain.
+The site should now work as expected. Browse to the URL defined within `OriginURL` output of the parent CloudFormation stack (e.g. http://s3bucketportalname.s3-website-eu-central-1.amazonaws.com), and select "Register" from the top right drop-down (Please note that this will be over HTTP and unencrypted at this point). Enter an email address (within the configured domain inside cogDomainVerify) and password, and select Register. You will receive a verification code from Cognito through email. Once the email is received with the token, select "Verify" from the top right drop-down; on the verify page, enter your email and the verification code provided. At this point, the site will redirect to login. Login with the authentication credentials created. To ensure only users within the specified domain can register for the portal, test registering with an email address on an unapproved domain.
 
 On the main page, the ability to request a WorkSpace should now be displayed. Request a WorkSpace with a user (which must exist within the Directory; only include the username itself without any domain information within it) and select a Bundle to use. It should begin the approval process, and the email address configured for approvals should receive an Approval Request email within approximately 10 minutes, which is within time for the CloudWatch Event that triggers the Lambda function polling Step Functions to run (this can be configured lower within `wsportal.json` for the Lambda function if desired. Approve the request, and the creation process should begin.
 
