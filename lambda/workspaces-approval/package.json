@@ -6,6 +6,7 @@
   "author": "Earl Gay",
   "license": "BSD-2-Clause",
   "dependencies": {
-    "aws-sdk": "^2.814.0"
+    "aws-sdk": "^2.814.0",
+    "sendmail" : "^1.6.1"
   }
 }
