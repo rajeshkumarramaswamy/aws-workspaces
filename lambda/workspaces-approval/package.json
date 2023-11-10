@@ -1,0 +1,11 @@
+{
+  "name": "workspaces-approval",
+  "version": "1.0.0",
+  "description": "Approve AWS WorkSpaces.",
+  "main": "workspaces-approval.js",
+  "author": "Earl Gay",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "aws-sdk": "^2.814.0"
+  }
+}
